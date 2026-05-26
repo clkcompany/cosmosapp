@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COSMOS – Explore the Universe</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #02020A;
+      --surface: #0E0E2E;
+      --accent: #7C5CFC;
+      --gold: #FFB800;
+      --text: rgba(255,255,255,0.85);
+      --muted: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.08);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ── Stars background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 35%, rgba(255,255,255,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 20% 85%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 55%, rgba(255,255,255,0.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45% 45%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 65% 25%, rgba(255,255,255,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 5% 50%, rgba(255,255,255,0.3) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: rgba(2,2,10,0.75);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Courier New', monospace;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+    }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: #fff; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      background: radial-gradient(ellipse at 50% 40%, rgba(124,92,252,0.18) 0%, transparent 70%);
+    }
+    .hero-emoji { font-size: 72px; margin-bottom: 24px; }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,184,0,0.12);
+      border: 1px solid rgba(255,184,0,0.4);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.1em;
+      color: var(--gold);
+      margin-bottom: 22px;
+    }
+    h1 {
+      font-family: 'Courier New', monospace;
+      font-size: clamp(42px, 8vw, 80px);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: #fff;
+      line-height: 1.05;
+      margin-bottom: 20px;
+    }
+    h1 span { color: var(--accent); }
+    .hero-sub {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 17px;
+      margin-bottom: 40px;
+    }
+    .btn-group { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.18s, box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(135deg, #7C5CFC, #5B3FD4);
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(124,92,252,0.45);
+    }
+    .btn-primary:hover { box-shadow: 0 12px 40px rgba(124,92,252,0.6); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.10); }
+
+    /* ── Regions ── */
+    .section {
+      position: relative;
+      z-index: 1;
+      padding: 80px 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Courier New', monospace;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.06em;
+      margin-bottom: 40px;
+    }
+    .regions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .region-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .region-card:hover {
+      background: rgba(255,255,255,0.055);
+      border-color: rgba(255,255,255,0.15);
+    }
+    .region-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .region-emoji { font-size: 32px; }
+    .region-name {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #fff;
+    }
+    .region-tag {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
+    }
+    .region-desc { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .badge-free {
+      display: inline-block;
+      background: rgba(124,92,252,0.18);
+      border: 1px solid rgba(124,92,252,0.45);
+      color: var(--accent);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.07em;
+      margin-top: 10px;
+    }
+    .badge-premium {
+      display: inline-block;
+      background: rgba(255,184,0,0.13);
+      border: 1px solid rgba(255,184,0,0.4);
+      color: var(--gold);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.07em;
+      margin-top: 10px;
+    }
+
+    /* ── Features ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      text-align: center;
+    }
+    .feature-icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-title {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .feature-desc { color: var(--muted); font-size: 13px; }
+
+    /* ── Divider ── */
+    .divider {
+      position: relative;
+      z-index: 1;
+      height: 1px;
+      background: var(--border);
+      margin: 0 24px;
+    }
+
+    /* ── Contact ── */
+    .contact-box {
+      background: rgba(124,92,252,0.08);
+      border: 1px solid rgba(124,92,252,0.25);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+    }
+    .contact-box h2 {
+      font-family: 'Courier New', monospace;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .contact-box p { color: var(--muted); margin-bottom: 24px; }
+    .contact-email {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 22px;
+      color: var(--accent);
+      text-decoration: none;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .contact-email:hover {
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(124,92,252,0.5);
+    }
+
+    /* ── Footer ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-logo {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #fff; }
+    .footer-copy { color: var(--muted); font-size: 12px; width: 100%; text-align: center; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      nav { padding: 14px 18px; }
+      .nav-links { gap: 16px; }
+      .contact-box { padding: 28px 18px; }
+      footer { flex-direction: column; align-items: center; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">🚀 COSMOS</div>
+    <div class="nav-links">
+      <a href="#regions">Regions</a>
+      <a href="#features">Features</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-emoji">🌌</div>
+    <div class="hero-tag">✦ NOW AVAILABLE ON THE APP STORE</div>
+    <h1>EXPLORE THE<br><span>UNIVERSE</span></h1>
+    <p class="hero-sub">
+      A space exploration app built for curious minds. Journey through galaxies,
+      black holes, asteroids, and dwarf planets — all in your pocket.
+    </p>
+    <div class="btn-group">
+      <a class="btn btn-primary" href="#">
+        ⬇ Download on App Store
+      </a>
+      <a class="btn btn-ghost" href="#regions">
+        Explore Regions →
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Regions -->
+  <section class="section" id="regions">
+    <p class="section-label">✦ What's Inside</p>
+    <h2 class="section-title">EXPLORATION REGIONS</h2>
+    <div class="regions-grid">
+
+      <div class="region-card">
+        <div class="region-header">
+          <div class="region-emoji">🪐</div>
+          <div>
+            <div class="region-name">MILKY WAY</div>
+            <div class="region-tag" style="color:#7C5CFC;">OUR HOME GALAXY</div>
+          </div>
+        </div>
+        <p class="region-desc">Explore 8 planets, 13 moons, and the Sun with real NASA photography. Quiz questions for every object.</p>
+        <span class="badge-free">FREE</span>
+      </div>
+
+      <div class="region-card">
+        <div class="region-header">
+          <div class="region-emoji">🌀</div>
+          <div>
+            <div class="region-name">ANDROMEDA</div>
+            <div class="region-tag" style="color:#4FC3F7;">COSMIC NEIGHBOR</div>
+          </div>
+        </div>
+        <p class="region-desc">Voyage 2.5 million light years to our nearest spiral galaxy. Discover deep-space objects and satellite galaxies.</p>
+        <span class="badge-premium">⭐ PREMIUM</span>
+      </div>
+
+      <div class="region-card">
+        <div class="region-header">
+          <div class="region-emoji">⚫</div>
+          <div>
+            <div class="region-name">BLACK HOLES</div>
+            <div class="region-tag" style="color:#EF5350;">EVENT HORIZONS</div>
+          </div>
+        </div>
+        <p class="region-desc">Confront the most extreme objects in the universe — from Sagittarius A* to the first-ever photographed M87*.</p>
+        <span class="badge-premium">⭐ PREMIUM</span>
+      </div>
+
+      <div class="region-card">
+        <div class="region-header">
+          <div class="region-emoji">🪨</div>
+          <div>
+            <div class="region-name">ASTEROIDS</div>
+            <div class="region-tag" style="color:#D7CCC8;">ROCKY REMNANTS</div>
+          </div>
+        </div>
+        <p class="region-desc">Travel the asteroid belt and meet sample-return targets like Bennu and Ryugu — relics from the early Solar System.</p>
+        <span class="badge-premium">⭐ PREMIUM</span>
+      </div>
+
+      <div class="region-card">
+        <div class="region-header">
+          <div class="region-emoji">🔵</div>
+          <div>
+            <div class="region-name">DWARF PLANETS</div>
+            <div class="region-tag" style="color:#FFAB91;">BEYOND NEPTUNE</div>
+          </div>
+        </div>
+        <p class="region-desc">Meet Pluto, Eris, Haumea, Makemake, and Ceres — worlds too small to be planets, too fascinating to ignore.</p>
+        <span class="badge-premium">⭐ PREMIUM</span>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <p class="section-label">✦ Why COSMOS</p>
+    <h2 class="section-title">BUILT FOR EXPLORERS</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🛸</div>
+        <div class="feature-title">IMMERSIVE UI</div>
+        <p class="feature-desc">Cosmic map with floating regions, nebula glows, and smooth animations.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <div class="feature-title">QUIZ SYSTEM</div>
+        <p class="feature-desc">Test your knowledge with quick quizzes after exploring each object.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏅</div>
+        <div class="feature-title">BADGES</div>
+        <p class="feature-desc">Earn achievement badges as you explore and complete quizzes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <div class="feature-title">SCAN TRACKING</div>
+        <p class="feature-desc">Track which planets and objects you've visited across all regions.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">PRIVACY FIRST</div>
+        <p class="feature-desc">All data stored locally. No accounts, no tracking, no ads.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">♾️</div>
+        <div class="feature-title">ONE-TIME PURCHASE</div>
+        <p class="feature-desc">No subscription. Pay once, explore forever.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Contact -->
+  <section class="section" id="contact">
+    <div class="contact-box">
+      <h2>GET IN TOUCH</h2>
+      <p>Questions, feedback, or press inquiries? We'd love to hear from you.</p>
+      <a class="contact-email" href="mailto:tech@clk.company">
+        ✉ tech@clk.company
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">🚀 COSMOS</div>
+    <div class="footer-links">
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="terms-of-service.html">Terms of Service</a>
+      <a href="mailto:tech@clk.company">Contact</a>
+    </div>
+    <p class="footer-copy">© 2026 CLK Company · All rights reserved</p>
+  </footer>
+
+</body>
+</html>
